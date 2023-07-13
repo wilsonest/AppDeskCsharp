@@ -1,0 +1,366 @@
+using Empleados.modelo;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Empleados.datos
+{
+    public class EmpleadoCAD
+    {
+        //metodo insertar datos o guardar
+        public static bool guardar(Empleado e)
+        {
+            try
+            {
+                Conexion con = new Conexion();  //instaciamos la conexion
+                string sql = "insert into tbempleado values('"+e.Documento+ "','" + e.Nombres + "','" + e.Apellido + "','" + e.Edad + "','" + e.Direccion + "','" + e.Fecha_nacimiento + "')";
+                SqlCommand comando = new SqlCommand(sql,con.conectar());
+                int cantidad = comando.ExecuteNonQuery();
+                con.desconectar();
+                if (cantidad == 1)
+                {
+                    return true;
+                }
+                else return false;
+
+                
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+        //metodo para listar o consultar los datos
+        public static DataTable listar()
+        {
+            try
+            {
+                Conexion con = new Conexion();  //instaciamos la conexion
+                string sql = "SELECT * FROM tbempleado;";
+                SqlCommand comando = new SqlCommand(sql, con.conectar());
+                SqlDataReader dr = comando.ExecuteReader(CommandBehavior.CloseConnection);
+                DataTable dt = new DataTable();
+                dt.Load(dr);
+
+                con.desconectar();
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }  
+
+        //metodo para consultar por id
+        public static Empleado consultar(string documento)
+        {
+            try
+            {
+                Conexion con = new Conexion();  //instaciamos la conexion
+                string sql = "SELECT * FROM tbempleado WHERE documento = '"+documento+"';";
+                SqlCommand comando = new SqlCommand(sql, con.conectar());
+                SqlDataReader dr = comando.ExecuteReader();
+                
+                Empleado em = new Empleado();
+                if (dr.Read())
+                {
+                    em.Documento = dr["documento"].ToString();
+                    em.Nombres = dr["nombres"].ToString();
+                    em.Apellido = dr["apellido"].ToString();
+                    em.Direccion = dr["direccion"].ToString();
+                    em.Fecha_nacimiento = dr["fecha_nacimiento"].ToString();
+                    em.Edad = Convert.ToInt32(dr["edad"].ToString());
+                    con.desconectar();
+                    return em;
+                }
+                else
+                {
+                    con.desconectar();
+                    return null;
+                }
+
+               
+              
+
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
+
+        //metodo para actualizar
+        public static bool actualizar(Empleado e)
+        {
+            try
+            {
+                Conexion con = new Conexion();  //instaciamos la conexion
+                string sql = "UPDATE tbempleado SET nombres='" + e.Nombres + "',apellido='" + e.Apellido + "',edad='" + e.Edad + "',direccion='" + e.Direccion + "',fecha_nacimiento='" + e.Fecha_nacimiento + "'  where documento='" + e.Documento + "'";
+                SqlCommand comando = new SqlCommand(sql, con.conectar());
+                int cantidad = comando.ExecuteNonQuery();
+
+                if (cantidad == 1)
+                {
+                    con.desconectar();
+                    return true;
+                }
+                else
+                {
+                    con.desconectar();
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+
+        //metodo eliminar
+        public static bool eliminar(string documento)
+        {
+            try
+            {
+                Conexion con = new Conexion();  //instaciamos la conexion
+                string sql = "DELETE FROM tbempleado  where documento='" + documento + "'";
+                SqlCommand comando = new SqlCommand(sql, con.conectar());
+                int cantidad = comando.ExecuteNonQuery();
+
+                if (cantidad == 1)
+                {
+                    con.desconectar();
+                    return true;
+                }
+                else
+                {
+                    con.desconectar();
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+    }
+}
+----------------------------------------------------------------------------------------------------------------
+
+using Empleados.datos;
+using Empleados.modelo;
+using System.Data;
+
+namespace Empleados
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e) //evento de click guardar
+        {
+            if(txtDocumento.Text.Trim() == "")  //validacion de campo vacio
+            {
+               
+                MessageBox.Show("Debe igresar un documento valido");
+            }else if (txtNombres.Text.Trim().Length < 5)  //validacion de tama�o de texto
+            {
+                MessageBox.Show("Debe ingresar un nombre mas largo");
+            }
+            else
+            {
+                try
+                {
+                    Empleado em = new Empleado(); //instanciamos la clase empleado
+                    em.Apellido = txtApellido.Text.Trim().ToUpper();
+                    em.Nombres = txtNombres.Text.Trim().ToUpper();
+                    em.Direccion = txtDireccion.Text.Trim().ToUpper();  // igualamos los atributos de la clase Empleado
+                    em.Documento = txtDocumento.Text.Trim().ToUpper();  // con lo ingresado en los campor txt
+                    em.Edad = Convert.ToInt32(txtEdad.Text.Trim());
+                    em.Fecha_nacimiento =txtFechaNacimiento.Value.Year+"-"+ txtFechaNacimiento.Value.Month+"-"+txtFechaNacimiento.Value.Day;
+                    if (EmpleadoCAD.guardar(em))
+                    {
+                        llenarGrid(); // llamamos el metodo
+                        limpiarCampos();
+                        MessageBox.Show("Empleado guardado correctamente");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Ya existe otro empleado con el documento enviado");
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void llenarGrid() // metodo para mostrar los datos en el grid
+        {
+            DataTable datos = EmpleadoCAD.listar();
+            if (datos == null)
+            {
+                MessageBox.Show("No se logro acceder a los datos");
+            }
+            else
+            {
+                dgLista.DataSource = datos.DefaultView;
+            }
+        }
+
+        private void limpiarCampos() // meotodo para limpiar campos
+        {
+            txtApellido.Text = "";
+            txtNombres.Text = "";
+            txtDireccion.Text = "";
+            txtDocumento.Text = "";
+            txtEdad.Text = "";
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            llenarGrid();
+        }  // formulario inicial y aqui llamamos el metodo llenar grid
+
+        bool consultado = false;
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (txtDocumento.Text.Trim() == "")  //validacion de campo vacio
+            {
+           
+                MessageBox.Show("Debe igresar un documento");
+            }
+            else 
+            {
+                Empleado em = EmpleadoCAD.consultar(txtDocumento.Text.Trim());
+
+                if(em == null)
+                {
+                    MessageBox.Show("No existe el empleado con documento " +txtDocumento.Text);
+                    limpiarCampos();
+                    consultado = false;
+                }
+                else
+                {
+                    txtApellido.Text = em.Apellido;
+                    txtNombres.Text = em.Nombres;
+                    txtDireccion.Text = em.Direccion;
+                    txtDocumento.Text = em.Documento;
+                    txtEdad.Text = em.Edad.ToString();
+                    txtFechaNacimiento.Text = em.Fecha_nacimiento;
+                    consultado = true;
+                }
+            }
+        }   //boton para consultar
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (consultado == false)  
+            {
+
+                MessageBox.Show("Debe consultar el empleado");
+            }
+            else if (txtDocumento.Text.Trim() == "")  //validacion de campo vacio
+            {
+
+                MessageBox.Show("Debe igresar un documento valido");
+            }
+            else if (txtNombres.Text.Trim().Length < 5)  //validacion de tama�o de texto
+            {
+                MessageBox.Show("Debe ingresar un nombre mas largo");
+            }
+            else
+            {
+                try
+                {
+                    Empleado em = new Empleado(); //instanciamos la clase empleado
+                    em.Apellido = txtApellido.Text.Trim().ToUpper();
+                    em.Nombres = txtNombres.Text.Trim().ToUpper();
+                    em.Direccion = txtDireccion.Text.Trim().ToUpper();  // igualamos los atributos de la clase Empleado
+                    em.Documento = txtDocumento.Text.Trim().ToUpper();  // con lo ingresado en los campor txt
+                    em.Edad = Convert.ToInt32(txtEdad.Text.Trim());
+                    em.Fecha_nacimiento = txtFechaNacimiento.Value.Year + "-" + txtFechaNacimiento.Value.Month + "-" + txtFechaNacimiento.Value.Day;
+                    if (EmpleadoCAD.actualizar(em))
+                    {
+                        llenarGrid(); // llamamos el metodo
+                        limpiarCampos();
+                        MessageBox.Show("Empleado actualizado correctamente");
+                        consultado = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se actualizo");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }   //evento click actualizar
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+            if (consultado == false)
+            {
+
+                MessageBox.Show("Debe consultar el empleado");
+            }
+            else if(txtDocumento.Text.Trim() == "")  //validacion de campo vacio
+            {
+
+                MessageBox.Show("Debe igresar un documento valido");
+            }
+            else if (DialogResult.Yes == MessageBox.Show(null,"Realmente desea eliminar el registro?","Confirmacion",MessageBoxButtons.YesNo))  
+            {
+            
+                try
+                {
+                   
+                    if (EmpleadoCAD.eliminar(txtDocumento.Text.Trim()))
+                    {
+                        llenarGrid(); // llamamos el metodo
+                        limpiarCampos();
+                        MessageBox.Show("Empleado eliminado correctamente");
+                        consultado = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se actualizo");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }    //evento click eliminar
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------
