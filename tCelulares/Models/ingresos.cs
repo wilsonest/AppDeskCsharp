@@ -9,7 +9,7 @@ namespace tCelulares.modelo
     public class ingresos
     {
         private int cedula;
-        private string nombre;
+        public string nombre;
         private string apellido;
         private string telefono;
         private string modelo;                          //atributos

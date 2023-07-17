@@ -47,12 +47,12 @@ namespace tCelulares.datos
                 con.desconectar();
                 if (cant == 1)
                 {
-                   
+
                     return true;
                 }
                 else
                 {
-                 
+
                     return false;
                 }
 
@@ -86,7 +86,7 @@ namespace tCelulares.datos
                     em.Comentarios = dr["comentarios"].ToString();
                     em.Estado = dr["estado"].ToString();
                     em.Fechai = dr["fechai"].ToString();
-                    
+
                     con.desconectar();
                     return em;
                 }
@@ -165,7 +165,55 @@ namespace tCelulares.datos
             }
         }
 
-    }
+        //public static DataTable listarnombre()
+        //{
+        //    try
+        //    {
+        //        Conexion con = new Conexion();  //instaciamos la conexion
+        //        string sql = "SELECT * FROM usuarios;"; //consulta
+        //        SqlCommand comando = new SqlCommand(sql, con.conectar());
+        //        SqlDataReader dr = comando.ExecuteReader(CommandBehavior.CloseConnection);
+        //        DataTable dt = new DataTable();
+        //        dt.Load(dr);
 
+        //        con.desconectar();
+        //        return dt;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        return null;
+        //    }
+        //}
+
+        public static List<string> consultarname()
+        {
+            try
+            {
+                Conexion con = new Conexion(); //instanciamos la conexión
+                string sql = "SELECT nombre FROM usuarios";
+                SqlCommand comando = new SqlCommand(sql, con.conectar());
+                SqlDataReader dr = comando.ExecuteReader();
+
+                List<string> nombres = new List<string>(); // Crear una lista para almacenar los nombres
+
+                while (dr.Read())
+                {
+                    string nombre = dr["nombre"].ToString();
+                    nombres.Add(nombre); // Agregar el nombre a la lista
+                }
+
+                con.desconectar();
+                return nombres;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+    }
 }
+
 

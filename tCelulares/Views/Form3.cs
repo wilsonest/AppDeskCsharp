@@ -1,4 +1,6 @@
-﻿using tCelulares.datos;
+﻿using System.Data;
+using tCelulares.Controllers;
+using tCelulares.datos;
 using tCelulares.modelo;
 
 namespace tCelulares
@@ -14,7 +16,7 @@ namespace tCelulares
 
         private void Form3_Load(object sender, EventArgs e)
         {
-
+            llenarname();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -71,36 +73,37 @@ namespace tCelulares
         bool consultado = false;
         private void button2_Click_1(object sender, EventArgs e)
         {
-            if (txtCedula.Text.Trim() == "")  //validacion de campo vacio
-            {
+            llenarname();
+            //if (txtCedula.Text.Trim() == "")  //validacion de campo vacio
+            //{
 
-                MessageBox.Show("Para consultar debe igresar un documento");
-            }
-            else
-            {
-                ingresos ingre = AccesoDatos.consultar(txtCedula.Text.Trim()); //Instanciamos la clase  y llamamos el metodo consultar
+            //    MessageBox.Show("Para consultar debe igresar un documento");
+            //}
+            //else
+            //{
+            //    ingresos ingre = AccesoDatos.consultar(txtCedula.Text.Trim()); //Instanciamos la clase  y llamamos el metodo consultar
 
-                if (ingre == null)
-                {
-                    MessageBox.Show("No existe el dato con documento " + txtCedula.Text);
-                    limpiarCampos();
-                    consultado = false;
-                }
-                else
-                {
-                    txtNombre.Text = ingre.Nombre;
-                    txtApellido.Text = ingre.Apellido;
-                    txtTelefono.Text = ingre.Telefono;
-                    txtModelo.Text = ingre.Modelo;        //aqui actualizamos los campos de texto con las variables de los atributos
-                    txtMarca.Text = ingre.Marca;
-                    cbEstado.Text = ingre.Estado;
-                    txtComentarios.Text = ingre.Comentarios;
-                    txtFechai.Text = ingre.Fechai;
+            //    if (ingre == null)
+            //    {
+            //        MessageBox.Show("No existe el dato con documento " + txtCedula.Text);
+            //        limpiarCampos();
+            //        consultado = false;
+            //    }
+            //    else
+            //    {
+            //        txtNombre.Text = ingre.Nombre;
+            //        txtApellido.Text = ingre.Apellido;
+            //        txtTelefono.Text = ingre.Telefono;
+            //        txtModelo.Text = ingre.Modelo;        //aqui actualizamos los campos de texto con las variables de los atributos
+            //        txtMarca.Text = ingre.Marca;
+            //        cbEstado.Text = ingre.Estado;
+            //        txtComentarios.Text = ingre.Comentarios;
+            //        txtFechai.Text = ingre.Fechai;
 
 
-                    consultado = true;
-                }
-            }
+            //        consultado = true;
+            //    }
+            //}
         }  //boton consultar
 
         private void button4_Click(object sender, EventArgs e)
@@ -226,6 +229,29 @@ namespace tCelulares
         {
 
         }
+
+        private void cbNombre_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //llenarname();
+        }
+
+
+
+        public void llenarname()
+        {
+            List<string> nombres = AccesoDatos.consultarname();
+            if (nombres == null || nombres.Count == 0)
+            {
+                MessageBox.Show("No se logró acceder a los datos");
+            }
+            else
+            {
+                cbNombre.DataSource = nombres;
+            }
+        }
+
+
+
     }
 
 }

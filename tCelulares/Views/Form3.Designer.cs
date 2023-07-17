@@ -54,6 +54,7 @@
             this.button5 = new System.Windows.Forms.Button();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.cbNombre = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label1
@@ -299,11 +300,21 @@
             this.radioButton2.Text = "no";
             this.radioButton2.UseVisualStyleBackColor = true;
             // 
+            // cbNombre
+            // 
+            this.cbNombre.FormattingEnabled = true;
+            this.cbNombre.Location = new System.Drawing.Point(466, 322);
+            this.cbNombre.Name = "cbNombre";
+            this.cbNombre.Size = new System.Drawing.Size(198, 23);
+            this.cbNombre.TabIndex = 31;
+            this.cbNombre.SelectedIndexChanged += new System.EventHandler(this.cbNombre_SelectedIndexChanged);
+            // 
             // Form3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(713, 450);
+            this.Controls.Add(this.cbNombre);
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.button5);
@@ -366,5 +377,6 @@
         private Button button5;
         private RadioButton radioButton1;
         private RadioButton radioButton2;
+        private ComboBox cbNombre;
     }
 }

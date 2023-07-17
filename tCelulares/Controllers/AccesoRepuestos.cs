@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tCelulares.modelo;
 using tCelulares.Models;
 
 namespace tCelulares.Controllers
@@ -66,13 +67,14 @@ namespace tCelulares.Controllers
         //metodo para consultar por id
         public static repuestos consultar(string referencia)
         {
+            int refe = Convert.ToInt32(referencia);
             try
             {
                 Conexion con = new Conexion();  //instaciamos la conexion
                 string sql = "SELECT * FROM repuestos WHERE referencia = '" + referencia + "';";
                 SqlCommand comando = new SqlCommand(sql, con.conectar());
                 SqlDataReader dr = comando.ExecuteReader();
-
+                
                 repuestos rep = new repuestos();
                 if (dr.Read())
                 {
@@ -155,5 +157,7 @@ namespace tCelulares.Controllers
                 return false;
             }
         }
+
+      
     }
 }
